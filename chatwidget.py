@@ -44,22 +44,31 @@ class CopyButton(tk.Button):
 
 class MessageTextBox(ttk.Frame):
     def __init__(self, master, text, **kwargs):
-        super().__init__(master, **kwargs, padding=5)
-        self.grid_columnconfigure(0, weight=1)  # Add this line
-        self.grid_rowconfigure(0, weight=1)  # Add this line
+        super().__init__(master, **kwargs, padding=3)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
         self.text_widget = tk.Text(self, wrap=tk.WORD, height=4, width=50, state='disabled', relief=tk.SOLID, bg='#FFFACD')
-        self.text_widget.grid(row=0, column=0, sticky="nsew")  # Change pack to grid and add sticky option
+        self.text_widget.grid(row=0, column=0, sticky="nsew")
         self.set_text(text)
         self.copy_button = CopyButton(self, self.text_widget, bg="#FFFACD")
+        self.copy_button.config(font=("Arial", 7))
+        
         self.copy_button.place(relx=1.0, rely=0, x=-2, y=2, anchor=tk.NE)
+
+        # Bind the <Configure> event to adjust the height when the widget is resized
+        self.text_widget.bind("<Configure>", self.adjust_height)
 
     def set_text(self, text):
         self.text_widget.config(state='normal')
         self.text_widget.delete("1.0", tk.END)
         self.text_widget.insert(tk.END, text)
         self.text_widget.config(state='disabled')
+        self.adjust_height()
 
+    def adjust_height(self, event=None):
+        if event is None or event.widget == self.text_widget:
+            self.text_widget.config(height=self.text_widget.count("1.0", "end", "displaylines")[0])
 
 
 class TurnWidget(ttk.Frame):
@@ -77,10 +86,10 @@ class TurnWidget(ttk.Frame):
         self.top_frame = ttk.Frame(self)
         self.top_frame.grid(row=0, column=0, sticky="ew")
 
-        self.user_label = ttk.Label(self.top_frame, text=self.user, font=("Arial", 8))
+        self.user_label = ttk.Label(self.top_frame, text=self.user)
         self.user_label.pack(side=tk.LEFT)
 
-        self.copy_turn_button = CopyButton(self.top_frame, self, font=("Arial", 8))
+        self.copy_turn_button = CopyButton(self.top_frame, self)
         self.copy_turn_button.pack(side=tk.RIGHT)
 
         self.prompt_textbox = MessageTextBox(self, self.prompt)
