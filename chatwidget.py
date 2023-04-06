@@ -138,6 +138,9 @@ class TurnLog(ttk.Frame):
         self.toggle_prompts_var = tk.BooleanVar(value=True)
         self.toggle_prompts_check = ttk.Checkbutton(self.top_frame, text="Toggle Prompts", variable=self.toggle_prompts_var, command=self.toggle_all_prompts)
         self.toggle_prompts_check.pack(side=tk.LEFT)
+        
+        self.add_turn_button = ttk.Button(self.top_frame, text="Add Turn", command=self.add_turn)
+        self.add_turn_button.pack(side=tk.LEFT)
 
         self.copy_turns_button = CopyButton(self.top_frame, self)
         self.copy_turns_button.config(font=("Arial", 10))  # Set the font size to the default size
@@ -236,6 +239,24 @@ class TurnLog(ttk.Frame):
             turn_widget = TurnWidget(self.scrollable_frame, turn.timestamp, turn.user, turn.prompt, turn.completion)
             turn_widget.pack(fill=tk.X, padx=10, pady=10)
 
+    def add_turn(self):
+        # Check if the user is scrolled to the bottom
+        is_scrolled_to_bottom = self.canvas.yview()[1] == 1.0
+
+        timestamp = datetime.now().timestamp()
+        user = "New User"
+        prompt = "New prompt"
+        completion = "New completion"
+
+        new_turn = Turn(timestamp, user, prompt, completion)
+        self.turns.append(new_turn)
+
+        turn_widget = TurnWidget(self.scrollable_frame, new_turn.timestamp, new_turn.user, new_turn.prompt, new_turn.completion)
+        turn_widget.pack(fill=tk.X, padx=10, pady=10)
+
+        # If the user was scrolled to the bottom, scroll back to the bottom
+        if is_scrolled_to_bottom:
+            self.canvas.after(100, lambda: self.canvas.yview_moveto(1.0))  # Scroll to the bottom after 100ms
 
 
 if __name__ == "__main__":
