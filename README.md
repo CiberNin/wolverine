@@ -11,20 +11,26 @@ For a quick demonstration see my [demo video on twitter](https://twitter.com/bio
 ## Setup
 
     python3 -m venv venv
-    pip install -r requirements.txt
     source venv/bin/activate
+    pip install -r requirements.txt
 
 Add your openAI api key to `openai_key.txt` - _warning!_ by default this uses GPT-4 and may make many repeated calls to the api.
 
 ## Example Usage
 
+To run with gpt-4 (the default, tested option):
+
     python wolverine.py buggy_script.py "subtract" 20 3
+
+You can also run with other models, but be warned they may not adhere to the edit format as well:
+
+    python wolverine.py --model=gpt-3.5-turbo buggy_script.py "subtract" 20 3
 
 ## Future Plans
 
 This is just a quick prototype I threw together in a few hours. There are many possible extensions and contributions are welcome:
 
-- add flags to customize usage, such as using GPT3.5-turbo instead or asking for user confirmation before running changed code
+- add flags to customize usage, such as asking for user confirmation before running changed code
 - further iterations on the edit format that GPT responds in. Currently it struggles a bit with indentation, but I'm sure that can be improved
 - a suite of example buggy files that we can test prompts on to ensure reliablity and measure improvement
 - multiple files / codebases: send GPT everything that appears in the stacktrace
