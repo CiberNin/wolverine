@@ -8,9 +8,10 @@ def read_openai_key() -> str:
     with open("../openai_key.txt", "r") as key_file:
         return key_file.read().strip()
 
-def scan_good_scripts_directory() -> List[Tuple[str, str]]:
+def scan_good_scripts_directory() -> Tuple[List[Tuple[str, str]], int]:
     existing_concept_pairs = []
     good_scripts_path = "good_scripts"
+    max_index = 0
 
     for script_file in os.listdir(good_scripts_path):
         with open(os.path.join(good_scripts_path, script_file), "r") as file:
@@ -21,7 +22,11 @@ def scan_good_scripts_directory() -> List[Tuple[str, str]]:
                 if len(concepts) == 2:
                     existing_concept_pairs.append((concepts[0].strip(), concepts[1].strip()))
 
-    return existing_concept_pairs
+        index = int(script_file.split("_")[1].split(".")[0])
+        if index > max_index:
+            max_index = index
+
+    return existing_concept_pairs, max_index
 
 def generate_new_concept_pairs(existing_pairs: List[Tuple[str, str]], n: int) -> List[Tuple[str, str]]:
     openai.api_key = read_openai_key()
@@ -95,18 +100,18 @@ def generate_scripts(concept_pairs: List[Tuple[str, str]]) -> List[str]:
 
     return scripts
 
-def save_scripts_to_directory(scripts: List[str]):
+def save_scripts_to_directory(scripts: List[str], start_index: int):
     good_scripts_path = "good_scripts"
 
     for i, script in enumerate(scripts):
-        with open(os.path.join(good_scripts_path, f"script_{i+1}.py"), "w") as file:
+        with open(os.path.join(good_scripts_path, f"script_{start_index + i + 1}.py"), "w") as file:
             file.write(script)
 
 def main():
-    existing_pairs = scan_good_scripts_directory()
+    existing_pairs, max_index = scan_good_scripts_directory()
     new_pairs = generate_new_concept_pairs(existing_pairs, 5)
     scripts = generate_scripts(new_pairs)
-    save_scripts_to_directory(scripts)
+    save_scripts_to_directory(scripts, max_index)
 
 if __name__ == "__main__":
     main()
